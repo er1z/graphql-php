@@ -718,4 +718,18 @@ final class QueryExecutionTest extends ServerTestCase
         self::assertIsCallable($formatter);
         self::assertArraySubset($expected, $formatted);
     }
+
+    public function testArgumentMutationDoesNotChangeTheSchema(): void
+    {
+        $query = 'query ($pollute: Boolean) { immutableDefaults(pollute: $pollute) }';
+
+        $this->executeQuery($query, ['pollute' => true]);
+        $result = $this->executeQuery($query, ['pollute' => false]);
+
+        $this->assertEquals([
+            'data' => [
+                'immutableDefaults' => 'default'
+            ]
+        ], $result->toArray());
+    }
 }

@@ -76,6 +76,30 @@ abstract class ServerTestCase extends TestCase
                             return new Deferred(static fn () => $context['load']($args['num']));
                         },
                     ],
+                    'immutableDefaults' => [
+                        'type' => Type::string(),
+                        'args' => [
+                            'filters' => [
+                                'type' => new ObjectType([
+                                    'name' => 'TestFilters',
+                                    'fields' => [
+                                        'field' => Type::string()
+                                    ]
+                                ]),
+                                'defaultValue' => new TestFilters()
+                            ],
+                            'pollute' => [
+                                'type' => Type::boolean()
+                            ]
+                        ],
+                        'resolve' => static function ($root, array $args) {
+                            if ($args['pollute']) {
+                                $args['filters']->field = 'polluted';
+                            }
+
+                            return $args['filters']->field;
+                        }
+                    ]
                 ],
             ]),
             'mutation' => new ObjectType([
